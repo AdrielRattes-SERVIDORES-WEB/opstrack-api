@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  docker:
+    name: docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o codigo
+        uses: actions/checkout@v4
+      - name: Construir a imagem
+        run: docker build -t opstrack-api:ci .
+      - name: Subir o container e testar o /status
+        run: |
+          docker run -d --name api -p 8000:8000 opstrack-api:ci
+          sleep 5
+          curl --fail http://localhost:8000/status
